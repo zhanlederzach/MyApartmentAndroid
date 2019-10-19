@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ui.profile.ProfileFragment"
+    android:background="@android:color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center_horizontal">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:background="@drawable/rounded_bottom"
+                android:paddingBottom="85dp">
+
+                <TextView
+                    android:id="@+id/tvNameProfile"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Zhanel"
+                    android:textColor="@android:color/white"
+                    android:fontFamily="@font/sf_pro_display_medium"
+                    android:textSize="20sp"
+                    android:paddingTop="40dp"
+                    android:paddingBottom="8dp"
+                    android:gravity="center_horizontal"/>
+
+                <TextView
+                    android:id="@+id/tvEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="turlybayevazhan@gmail.com"
+                    android:textColor="@android:color/white"
+                    android:fontFamily="@font/sf_pro_display_medium"
+                    android:textSize="18sp"
+                    android:gravity="center_horizontal"/>
+
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/ivAvatar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/avatar"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:paddingTop="120dp"
+                android:elevation="1dp"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/tv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textColor="@android:color/black"
+                android:text="My statisctic"
+                android:textSize="17sp"
+                android:fontFamily="@font/sf_pro_display_medium"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"/>
+            <View
+                android:layout_width="match_parent"
+                android:background="#E2E2E2"
+                android:layout_height="1dp"/>
+
+            <TextView
+                android:id="@+id/tvAboutApp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sf_pro_display_medium"
+                android:textColor="@android:color/black"
+                android:text="Go to about app"
+                android:textSize="17sp"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:background="#E2E2E2"
+                android:layout_height="1dp"/>
+
+            <TextView
+                android:id="@+id/tvMyHistory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sf_pro_display_medium"
+                android:textColor="@android:color/black"
+                android:text="My history"
+                android:textSize="17sp"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:background="#E2E2E2"
+                android:layout_height="1dp"/>
+
+            <TextView
+                android:id="@+id/tvChangeLang"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sf_pro_display_medium"
+                android:textColor="@android:color/black"
+                android:text="Change language"
+                android:textSize="17sp"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:background="#E2E2E2"
+                android:layout_height="1dp"/>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnLogout"
+            android:layout_width="80dp"
+            android:layout_height="30dp"
+            android:background="@drawable/btn_rounded_solid"
+            android:fontFamily="@font/sf_pro_display_medium"
+            android:text="Logout"
+            android:textSize="14sp"
+            android:layout_marginTop="16dp"
+            android:textColor="#394c7e"
+            android:layout_gravity="center"/>
+
+    </LinearLayout>
+
+</ScrollView>

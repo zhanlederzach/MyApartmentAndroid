@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#394c7e</color>
+    <color name="colorPrimaryDark">#FFCC00</color>
+    <color name="colorAccent">#000</color>
+    <color name="disabledButton">#E2E2E2</color>
+    <color name="colorRegularBlack">#4D4D4D</color>
+    <color name="colorError">#EB5757</color>
+    <color name="colorPlayerBackground">#2B2B2B</color>
+    <color name="colorLink">#157EFB</color>
+    <color name="colorMatchHeader">#C9C9D0</color>
+    <color name="colorSplashBackground">#FFEB00</color>
+</resources>
