@@ -8,12 +8,14 @@ apply plugin: "androidx.navigation.safeargs"
 
 apply plugin: 'kotlin-kapt'
 
+apply plugin: 'android'
+
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.1"
     defaultConfig {
         applicationId "kz.myroom"
-        minSdkVersion 16
+        minSdkVersion 23
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
@@ -37,6 +39,10 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+}
+
+repositories {
+    mavenCentral()
 }
 
 dependencies {
@@ -96,8 +102,18 @@ dependencies {
 
     //joda for time
     implementation 'joda-time:joda-time:2.9.9'
-}
 
-repositories {
-    mavenCentral()
+    //stetho
+    debugImplementation 'com.facebook.stetho:stetho:1.5.1'
+    debugImplementation 'com.facebook.stetho:stetho-okhttp3:1.5.1'
+
+    //okhttp
+    implementation 'com.squareup.okhttp3:okhttp:3.12.2'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.2'
+
+    implementation 'commons-io:commons-io:2.6'
+
+    //glide
+    implementation 'com.github.bumptech.glide:glide:4.9.0'
+    kapt 'com.github.bumptech.glide:compiler:4.9.0'
 }

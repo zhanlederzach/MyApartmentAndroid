@@ -15,6 +15,7 @@ import androidx.navigation.findNavController
 
 import kz.myroom.R
 import kz.myroom.model.BedroomInfo
+import kz.myroom.model.Restaraunt
 import kz.myroom.ui.home.HomeViewModel
 import kz.myroom.utils.AppConstants
 import org.koin.android.ext.android.inject
@@ -32,7 +33,7 @@ class BedroomDetailFragment : Fragment() {
     private lateinit var tvDescription: TextView
 
     private val viewModel: HomeViewModel by inject()
-    private var bedroom: BedroomInfo? = null
+    private var bedroom: Restaraunt? = null
 
     override fun setArguments(args: Bundle?) {
         super.setArguments(args)
@@ -50,6 +51,7 @@ class BedroomDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel.deleteBookedRestoraunts()
         bindViews(view)
         setData()
     }
@@ -63,8 +65,10 @@ class BedroomDetailFragment : Fragment() {
         btnBook = view.findViewById(R.id.btnBook)
 
         btnBook.setOnClickListener {
-            bedroom?.id?.let {
-                viewModel.bookBedRoom(it)
+            bedroom?.let {
+                viewModel.bookRestaurant(it)
+                Toast.makeText(activity, "${bedroom?.name} successfully booked", Toast.LENGTH_SHORT).show()
+                view?.findNavController()?.navigate(R.id.actionBookBedroom)
             }
         }
     }
@@ -72,13 +76,13 @@ class BedroomDetailFragment : Fragment() {
     private fun setData() {
         tvDistance.setText("200 m")
         tvNameBedroom.setText(bedroom?.name)
-        tvDescription.setText(bedroom?.description)
-        tvDate.setText(bedroom?.date)
-        tvNumberOfRooms.setText(bedroom?.beedrooms.toString())
+        tvDescription.setText("Very good apartemt")
+        tvDate.setText("12.09.2019")
+        tvNumberOfRooms.setText(3.toString())
 
         viewModel.liveData.observe(this, Observer { result ->
             when(result) {
-                is HomeViewModel.BedroomData.ResultBooked -> {
+                is HomeViewModel.ResultData.Result -> {
                     Toast.makeText(activity, "${bedroom?.name} successfully booked", Toast.LENGTH_SHORT).show()
                     view?.findNavController()?.navigate(R.id.actionBookBedroom)
                 }

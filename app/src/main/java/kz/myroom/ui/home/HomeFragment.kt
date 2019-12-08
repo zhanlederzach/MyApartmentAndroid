@@ -1,6 +1,5 @@
 package kz.myroom.ui.home
 
-
 import android.Manifest
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
@@ -22,9 +21,11 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.chad.library.adapter.base.BaseQuickAdapter
 import kz.myroom.R
 import kz.myroom.model.BedroomInfo
+import kz.myroom.model.Restaraunt
 import kz.myroom.utils.AppConstants
 import kz.myroom.utils.custom_views.CustomDialog
 import kz.myroom.utils.extensions.initRecyclerView
@@ -34,6 +35,7 @@ import org.koin.android.ext.android.inject
 import permissions.dispatcher.NeedsPermission
 import permissions.dispatcher.OnShowRationale
 import permissions.dispatcher.PermissionRequest
+import java.util.ArrayList
 
 /**
  * done by Zhanel
@@ -44,7 +46,8 @@ class HomeFragment : Fragment() {
 
     private val viewModel: HomeViewModel by inject()
     private var locationManager: LocationManager? = null
-    private var bedroomList: List<BedroomInfo>? = null
+    private var bedroomList: List<Restaraunt>? = null
+    private lateinit var swipeRefresh: SwipeRefreshLayout
 
     private val beedroomAdapter by lazy {
         BeedroomAdapter()
@@ -67,6 +70,12 @@ class HomeFragment : Fragment() {
 
     private fun bindViews(view: View) {
         bedroomsRV = view.findViewById(R.id.bedroomList)
+        swipeRefresh = view.findViewById(R.id.swipeRefresh)
+
+        swipeRefresh.setOnRefreshListener {
+            beedroomAdapter.setNewData(ArrayList())
+            viewModel.getRestaraunts()
+        }
     }
 
     private fun setAdapter() {
@@ -77,13 +86,13 @@ class HomeFragment : Fragment() {
                 bundle.putParcelable(AppConstants.BEDROOM, bedroom)
                 view.findNavController().navigate(R.id.actionBedroomDetail, bundle)
             }
-            setEnableLoadMore(true)
-            setOnLoadMoreListener(object : BaseQuickAdapter.RequestLoadMoreListener {
-                @TargetApi(Build.VERSION_CODES.O)
-                override fun onLoadMoreRequested() {
-                    viewModel.getBedroomInfo()
-                }
-            }, bedroomsRV)
+//            setEnableLoadMore(true)
+//            setOnLoadMoreListener(object : BaseQuickAdapter.RequestLoadMoreListener {
+//                @TargetApi(Build.VERSION_CODES.O)
+//                override fun onLoadMoreRequested() {
+//                    viewModel.getRestaraunts()
+//                }
+//            }, bedroomsRV)
         }
         activity?.initRecyclerView(bedroomsRV)
         bedroomsRV.adapter = beedroomAdapter
@@ -91,31 +100,31 @@ class HomeFragment : Fragment() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun setData() {
-        viewModel.getBedroomInfo()
+        viewModel.getRestaraunts()
         viewModel.liveData.observe(this, Observer { result ->
             when(result) {
-                is HomeViewModel.BedroomData.LoadMoreFinished -> {
+                is HomeViewModel.ResultData.HideLoading -> {
+                    swipeRefresh.isRefreshing = false
+                }
+                is HomeViewModel.ResultData.ShowLoading -> {
+                    swipeRefresh.isRefreshing = true
+                }
+                is HomeViewModel.ResultData.LoadMoreFinished -> {
                     beedroomAdapter.apply {
                         loadMoreComplete()
                         loadMoreEnd(true)
                     }
                 }
-                is HomeViewModel.BedroomData.Result -> {
+                is HomeViewModel.ResultData.Result -> {
 //                    if (isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)) {
-                        bedroomList = result.bedRoomInfo
-                        beedroomAdapter.replaceData(result.bedRoomInfo as MutableList<BedroomInfo>)
+                        bedroomList = result.info
+                        beedroomAdapter.replaceData(result.info as MutableList<Restaraunt>)
 //                        getDistance()
 //                    }else {
 //                        getUserLocationWithPermissionCheck()
 //                    }
                 }
-                is HomeViewModel.BedroomData.LoadMoreResult -> {
-                    beedroomAdapter.apply {
-                        loadMoreComplete()
-                        addData(result.bedRoomInfo)
-                    }
-                }
-                is HomeViewModel.BedroomData.Error -> {
+                is HomeViewModel.ResultData.Error -> {
                     Toast.makeText(activity, "Some error occurred", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -138,11 +147,11 @@ class HomeFragment : Fragment() {
                 if (assertStudioLocationCorrect(bedroom)) {
                     bedroom.dictance = AppConstants.meterDistanceBetweenPoints(
                         userLocation.latitude, userLocation.longitude,
-                        bedroom.latitude, bedroom.longitude
+                        bedroom.lat, bedroom.lng
                     ).toInt()
                 }
             }
-            beedroomAdapter.setSortedData(bedroomList as MutableList<BedroomInfo>)
+            beedroomAdapter.setSortedData(bedroomList as MutableList<Restaraunt>)
         }
     }
 
@@ -167,8 +176,8 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun assertStudioLocationCorrect(bedroom: BedroomInfo?): Boolean {
-        return bedroom?.latitude != null || bedroom?.longitude != null
+    private fun assertStudioLocationCorrect(bedroom: Restaraunt?): Boolean {
+        return bedroom?.lat != null || bedroom?.lng != null
     }
 
     data class PreferenceForBedroom(

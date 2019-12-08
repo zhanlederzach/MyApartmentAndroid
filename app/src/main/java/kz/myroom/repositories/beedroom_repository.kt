@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter
 interface IApartmentRepository {
     fun getBedrooms(offset: Int): Single<List<BedroomInfo>>
     fun getBookedBedrooms(): Single<List<BedroomInfo>>
-    fun bookBedroom(idOfBedroom: String): String
+    fun bookBedroom(idOfBedroom: Int): String
 }
 
 class ApartmentRepositoryImpl (
@@ -66,16 +66,16 @@ class ApartmentRepositoryImpl (
         return Single.fromCallable() { listOfBookedRooms }
     }
 
-    override fun bookBedroom(idOfBedroom: String): String {
+    override fun bookBedroom(idOfBedroom: Int): String {
         var cnt = 0
         for(item in listOfbedRooms){
-            if(item.id == idOfBedroom){
-                val bedroom = item
-                (listOfBookedRooms as MutableList<BedroomInfo>).add(bedroom)
-                (listOfbedRooms as MutableList<BedroomInfo>).removeAt(cnt)
-                return item.id
-            }
-            ++cnt
+//            if(item.id == idOfBedroom){
+//                val bedroom = item
+//                (listOfBookedRooms as MutableList<BedroomInfo>).add(bedroom)
+//                (listOfbedRooms as MutableList<BedroomInfo>).removeAt(cnt)
+//                return item.id
+//            }
+//            ++cnt
         }
         return "Error"
     }

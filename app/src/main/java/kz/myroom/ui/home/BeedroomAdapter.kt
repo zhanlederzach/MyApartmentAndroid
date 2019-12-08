@@ -4,36 +4,36 @@ import android.widget.Button
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import kz.myroom.R
-import kz.myroom.model.BedroomInfo
+import kz.myroom.model.Restaraunt
 import kz.myroom.utils.extensions.setTextAsync
 import org.joda.time.DateTimeComparator
 
 
-class BeedroomAdapter: BaseQuickAdapter<BedroomInfo, BaseViewHolder>(R.layout.item_bedroom) {
+class BeedroomAdapter: BaseQuickAdapter<Restaraunt, BaseViewHolder>(R.layout.item_bedroom) {
 
-    override fun convert(helper: BaseViewHolder, item: BedroomInfo?) {
+    override fun convert(helper: BaseViewHolder, item: Restaraunt?) {
         helper.apply {
             getView<Button>(R.id.btnBook).setTransformationMethod(null)
-            setTextAsync(R.id.tvNameBedroom, item?.name)
-            setTextAsync(R.id.tvDescription, item?.description)
-            setTextAsync(R.id.tvDate, item?.date.toString())
+            setTextAsync(R.id.tvTitleResto, item?.name)
+            setTextAsync(R.id.tvDescription, "LoremLoremLoremLoremLoremLoremLoremLoremLoremLoremLoremLorem")
+            setTextAsync(R.id.tvDate, "10.12.2019")
         }
     }
 
-    override fun replaceData(data: MutableCollection<out BedroomInfo>) {
+    override fun replaceData(data: MutableCollection<out Restaraunt>) {
         mData.clear()
         mData.addAll(data)
         notifyDataSetChanged()
     }
 
 
-    fun setSortedData(data: MutableList<BedroomInfo>) {
-        if(data.size > 0){
-            val listOfBerooms = data.sortedWith(compareBy({ it.dictance })) as MutableList<BedroomInfo>
-            replaceData(listOfBerooms)
-        } else {
-            replaceData(arrayListOf())
-        }
+    fun setSortedData(data: MutableList<Restaraunt>) {
+//        if(data.size > 0){
+//            val listOfBerooms = data.sortedWith(compareBy({ it.dictance })) as MutableList<BedroomInfo>
+//            replaceData(listOfBerooms)
+//        } else {
+//            replaceData(arrayListOf())
+//        }
     }
 /*
     fun setFilteredBedrooms(preferenceForBedroom: HomeFragment.PreferenceForBedroom) {
