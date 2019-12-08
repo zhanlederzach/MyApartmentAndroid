@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity(),
     private lateinit var mainPager: NonSwipingViewPager
     private lateinit var bottomNav: BottomNavigationView
 
-    private val backStack = Stack<Int>()
+    val backStack = Stack<Int>()
     private val fragments = listOf(
         BaseFragment.newInstance(R.layout.content_home_base, R.id.toolbar_home, R.id.nav_host_home),
         BaseFragment.newInstance(R.layout.content_news_base, R.id.toolbar_news, R.id.nav_host_news),

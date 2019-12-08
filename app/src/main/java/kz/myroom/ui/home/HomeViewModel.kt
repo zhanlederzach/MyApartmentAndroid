@@ -11,13 +11,14 @@ import kz.myroom.model.BedroomInfo
 import kz.myroom.model.Restaraunt
 import kz.myroom.repositories.IApartmentRepository
 import kz.myroom.repositories.IRestarauntRepository
+import kz.myroom.repositories.NoConnectionException
 import kz.myroom.utils.AppConstants
+import kz.myroom.utils.Constants
 import kz.myroom.utils.base.BaseViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 class HomeViewModel(
-    private val bedroomRepository: IApartmentRepository,
     private val restarauntRepository: IRestarauntRepository
 ): BaseViewModel() {
 
@@ -25,7 +26,7 @@ class HomeViewModel(
         MutableLiveData<ResultData>()
     }
 
-    private var currentPage = AppConstants.DEFAULT_PAGE
+    private var currentPage = Constants.DEFAULT_PAGE
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun getBedroomInfo(){
@@ -54,16 +55,57 @@ class HomeViewModel(
 //        )
     }
 
-    fun getRestaraunts(){
+    fun getRestaraunts(isRefresh: Boolean = false){
+        if (isRefresh) {
+            currentPage = Constants.DEFAULT_PAGE
+        }
         disposables.add(
-            restarauntRepository.getRestoraunts()
+            restarauntRepository.getRestoraunts(currentPage = currentPage)
                 .compose(applySchedulersSingle())
-                .doOnSubscribe { liveData.value = ResultData.ShowLoading }
+                .doOnSubscribe {
+                    if (currentPage == Constants.DEFAULT_PAGE) {
+                        liveData.value = ResultData.ShowLoading
+                    }
+                }
                 .doFinally { liveData.value = ResultData.HideLoading }
                 .subscribe({ result ->
-                    liveData.value = ResultData.Result(result)
+                    if (currentPage == Constants.DEFAULT_PAGE) {
+                        liveData.value = ResultData.Result(result)
+                    } else {
+                        liveData.value = ResultData.LoadMoreResult(result)
+                        liveData.value = ResultData.LoadMoreFinished
+                    }
+                    currentPage++
                 } , { error ->
-                    liveData.value = ResultData.Error(error.message)
+                    if (error is NoConnectionException) {
+                        currentPage = Constants.DEFAULT_PAGE
+                        getFromLocal()
+                    }
+                    liveData.value = ResultData.Error(error.message ?: "")
+                    liveData.value = ResultData.LoadMoreFinished
+                })
+        )
+    }
+
+    private fun getFromLocal() {
+        disposables.add(
+            restarauntRepository.getLocalResto()
+                .compose(applySchedulersSingle())
+                .subscribe(
+                    { liveData.value = ResultData.Result(it) },
+                    { }
+                )
+        )
+    }
+
+    fun findResoraunt(name: String?){
+        disposables.add(
+            restarauntRepository.findRestoraunt(name = name)
+                .compose(applySchedulersSingle())
+                .subscribe({ result ->
+                    liveData.postValue(ResultData.Result(result))
+                } , { error ->
+                    liveData.postValue(ResultData.Error(error.message))
                 })
         )
     }
@@ -72,8 +114,6 @@ class HomeViewModel(
         disposables.add(
             restarauntRepository.getBookedRestaurants()
                 .compose(applySchedulersSingle())
-                .doOnSubscribe { liveData.value = ResultData.ShowLoading }
-                .doFinally { liveData.value = ResultData.HideLoading }
                 .subscribe({ result ->
                     liveData.value = ResultData.Result(result)
                 } , { error ->
@@ -82,27 +122,8 @@ class HomeViewModel(
         )
     }
 
-    fun bookBedRoom(id: Int) {
-        bedroomRepository.bookBedroom(idOfBedroom = id)
-//        liveData.value = BedroomData.ResultBooked
-    }
-
     fun bookRestaurant(restoraunt: Restaraunt) {
         restarauntRepository.bookRestaurant(restoraunt)
-    }
-
-    fun deleteBookedRestoraunts() {
-        restarauntRepository.deleteBookedRestaurants()
-    }
-
-    sealed class BedroomData {
-        object HideLoading: BedroomData()
-        object ShowLoading: BedroomData()
-        object ResultBooked: BedroomData()
-        data class Result(val bedRoomInfo: List<BedroomInfo>): BedroomData()
-        data class Error(val message: String?): BedroomData()
-        object LoadMoreFinished: BedroomData()
-        data class LoadMoreResult(val bedRoomInfo: List<BedroomInfo>): BedroomData()
     }
 
     sealed class ResultData {
@@ -112,6 +133,6 @@ class HomeViewModel(
         data class Result(val info: List<Restaraunt>): ResultData()
         data class Error(val message: String?): ResultData()
         object LoadMoreFinished: ResultData()
-        data class LoadMoreResult(val bedRoomInfo: List<BedroomInfo>): ResultData()
+        data class LoadMoreResult(val info: List<Restaraunt>): ResultData()
     }
 }

@@ -9,6 +9,13 @@ interface RestarauntApi {
 
     @GET("restaurants")
     fun getRestoraunts(
-        @Query("city") city: String
+        @Query("city") city: String,
+        @Query("current_page") currentPage: Int
+    ): Single<RestarauntResponse>
+
+    @GET("restaurants")
+    fun findRestoraunt(
+        @Query("city") city: String,
+        @Query("name") name: String?
     ): Single<RestarauntResponse>
 }

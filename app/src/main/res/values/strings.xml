@@ -7,4 +7,5 @@
     <string name="home">Home</string>
     <string name="profile">Profile</string>
     <string name="history">History</string>
+    <string name="search_by_name">search by name</string>
 </resources>

@@ -45,7 +45,7 @@ data class Restaraunt(
     @SerializedName("reserve_url") val reserveUrl: String?,
     @SerializedName("mobile_reserve_url") val mobileReserveUrl: String?,
     @SerializedName("image_url") val imageUrl: String?,
-    var dictance: Int? = 0
+    @SerializedName("dictance") var dictance: Int? = 0
 ): Serializable, Parcelable
 
 @Parcelize

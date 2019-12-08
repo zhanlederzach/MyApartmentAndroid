@@ -11,6 +11,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kz.myroom.api.RestarauntApi
 import kz.myroom.repositories.*
+import kz.myroom.ui.history.HistoryViewModel
 import kz.myroom.ui.home.HomeViewModel
 import kz.myroom.ui.profile.ProfileViewModel
 import kz.myroom.utils.StethoUtils
@@ -43,7 +44,8 @@ val networkModule = module {
 
 val viewModelModule = module (override = true) {
     viewModel { ProfileViewModel() }
-    viewModel { HomeViewModel(get(), get()) }
+    viewModel { HomeViewModel(get()) }
+    viewModel { HistoryViewModel(get()) }
 }
 
 fun <T> applySchedulersSingle(): SingleTransformer<T, T> {

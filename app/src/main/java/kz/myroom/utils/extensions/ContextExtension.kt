@@ -6,6 +6,7 @@ import android.view.inputmethod.InputMethodManager
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 
 fun Context.initRecyclerView(
     recyclerView: RecyclerView,
@@ -18,5 +19,13 @@ fun Context.initRecyclerView(
     layoutManager = linearLayoutManager
     setHasFixedSize(true)
     setItemViewCacheSize(20)
+}
+
+fun Context.circularProgress(): CircularProgressDrawable {
+    return CircularProgressDrawable(this).apply {
+        strokeWidth = 3f
+        centerRadius = 15f
+        start()
+    }
 }
 

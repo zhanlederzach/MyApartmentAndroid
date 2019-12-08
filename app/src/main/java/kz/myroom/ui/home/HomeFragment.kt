@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.location.Criteria
@@ -18,15 +19,19 @@ import android.view.ViewGroup
 import android.view.Window
 import android.widget.*
 import androidx.annotation.RequiresApi
+import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.chad.library.adapter.base.BaseQuickAdapter
+import kz.myroom.App
 import kz.myroom.R
 import kz.myroom.model.BedroomInfo
 import kz.myroom.model.Restaraunt
+import kz.myroom.ui.history.HistoryViewModel
 import kz.myroom.utils.AppConstants
+import kz.myroom.utils.RxSearchObservable
 import kz.myroom.utils.custom_views.CustomDialog
 import kz.myroom.utils.extensions.initRecyclerView
 import kz.myroom.utils.extensions.isPermissionGranted
@@ -36,6 +41,7 @@ import permissions.dispatcher.NeedsPermission
 import permissions.dispatcher.OnShowRationale
 import permissions.dispatcher.PermissionRequest
 import java.util.ArrayList
+import java.util.concurrent.TimeUnit
 
 /**
  * done by Zhanel
@@ -45,12 +51,33 @@ class HomeFragment : Fragment() {
     private lateinit var bedroomsRV: RecyclerView
 
     private val viewModel: HomeViewModel by inject()
+
     private var locationManager: LocationManager? = null
     private var bedroomList: List<Restaraunt>? = null
+
+    private lateinit var etSearchView: SearchView
     private lateinit var swipeRefresh: SwipeRefreshLayout
 
+    private var onBookClickListener: OnBookClickListener? = object : OnBookClickListener {
+        override fun bookClickListener(restaraunt: Restaraunt) {
+            viewModel.bookRestaurant(restaraunt)
+            Toast.makeText(activity, "${restaraunt.name} successfully booked", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private var onShareClickListener: OnShareClickListener? = object : OnShareClickListener {
+        override fun shareClickListener(restaraunt: Restaraunt) {
+            val sharingIntent = Intent(Intent.ACTION_SEND)
+            sharingIntent.type = "text/plain"
+            val shareBody = "Application Link : https://play.google.com/store/apps/details?id=${context?.getPackageName()}"
+            sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "App link")
+            sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody)
+            startActivity(Intent.createChooser(sharingIntent, "Share App Link Via :"))
+        }
+    }
+
     private val beedroomAdapter by lazy {
-        BeedroomAdapter()
+        BeedroomAdapter(onBookClickListener, onShareClickListener)
     }
 
     override fun onCreateView(
@@ -68,14 +95,22 @@ class HomeFragment : Fragment() {
         setData()
     }
 
-    private fun bindViews(view: View) {
-        bedroomsRV = view.findViewById(R.id.bedroomList)
-        swipeRefresh = view.findViewById(R.id.swipeRefresh)
+    private fun bindViews(view: View) = with(view) {
+        bedroomsRV = findViewById(R.id.bedroomList)
+        swipeRefresh = findViewById(R.id.swipeRefresh)
+        etSearchView = findViewById(R.id.etSearchView)
 
         swipeRefresh.setOnRefreshListener {
             beedroomAdapter.setNewData(ArrayList())
-            viewModel.getRestaraunts()
+            etSearchView.setQuery("", true)
+            viewModel.getRestaraunts(true)
         }
+        RxSearchObservable.fromView(etSearchView)
+            .debounce(300, TimeUnit.MILLISECONDS)
+            .distinctUntilChanged()
+            .subscribe { text ->
+                viewModel.findResoraunt(text.toString())
+            }
     }
 
     private fun setAdapter() {
@@ -86,13 +121,13 @@ class HomeFragment : Fragment() {
                 bundle.putParcelable(AppConstants.BEDROOM, bedroom)
                 view.findNavController().navigate(R.id.actionBedroomDetail, bundle)
             }
-//            setEnableLoadMore(true)
-//            setOnLoadMoreListener(object : BaseQuickAdapter.RequestLoadMoreListener {
-//                @TargetApi(Build.VERSION_CODES.O)
-//                override fun onLoadMoreRequested() {
-//                    viewModel.getRestaraunts()
-//                }
-//            }, bedroomsRV)
+            setEnableLoadMore(true)
+            setOnLoadMoreListener(object : BaseQuickAdapter.RequestLoadMoreListener {
+                @TargetApi(Build.VERSION_CODES.O)
+                override fun onLoadMoreRequested() {
+                    viewModel.getRestaraunts()
+                }
+            }, bedroomsRV)
         }
         activity?.initRecyclerView(bedroomsRV)
         bedroomsRV.adapter = beedroomAdapter
@@ -100,7 +135,7 @@ class HomeFragment : Fragment() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun setData() {
-        viewModel.getRestaraunts()
+        viewModel.getRestaraunts(true)
         viewModel.liveData.observe(this, Observer { result ->
             when(result) {
                 is HomeViewModel.ResultData.HideLoading -> {
@@ -123,6 +158,12 @@ class HomeFragment : Fragment() {
 //                    }else {
 //                        getUserLocationWithPermissionCheck()
 //                    }
+                }
+                is HomeViewModel.ResultData.LoadMoreResult -> {
+                    beedroomAdapter.apply {
+                        loadMoreComplete()
+                        addData(result.info)
+                    }
                 }
                 is HomeViewModel.ResultData.Error -> {
                     Toast.makeText(activity, "Some error occurred", Toast.LENGTH_SHORT).show()

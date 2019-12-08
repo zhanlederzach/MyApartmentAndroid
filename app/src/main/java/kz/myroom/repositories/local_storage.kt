@@ -2,8 +2,12 @@ package kz.myroom.repositories
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import java.io.File
 import org.apache.commons.io.FileUtils
+import android.widget.Toast
+import java.io.IOException
+
 
 interface ILocalRepository {
     var isRegistered: Boolean
@@ -50,9 +54,12 @@ class LocalStorageImpl(
     }
 
     override fun getDataFromFile(fileName: String): String? {
-        return FileUtils.readFileToString(File("${context.cacheDir}/$fileName"),
-            Charsets.UTF_8.toString()
-        )
+        try {
+            return FileUtils.readFileToString(File("${context.cacheDir}/$fileName"),"UTF_8")
+        } catch (e: IOException) {
+            Log.d("local_storage", "getDataFromFile: ");
+            return ""
+        }
     }
 
     private fun deleteFile(file: File?): Boolean {
