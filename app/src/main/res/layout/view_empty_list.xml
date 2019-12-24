@@ -7,14 +7,16 @@
     android:paddingTop="100dp"
     android:paddingBottom="200dp">
 
-    <Button
-        android:id="@+id/btnRefresh"
+    <TextView
+        android:id="@+id/tvNoResto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
+        android:padding="16dp"
+        android:gravity="center"
         android:background="@drawable/btn_rounded_solid"
         android:fontFamily="@font/sf_pro_display_medium"
-        android:text="Обновите лист плез"
+        android:text="You have no booked restoraunts"
         android:textSize="14sp"
         android:textColor="#394c7e" />
 

@@ -166,7 +166,8 @@ class HomeFragment : Fragment() {
                     }
                 }
                 is HomeViewModel.ResultData.Error -> {
-                    Toast.makeText(activity, "Some error occurred", Toast.LENGTH_SHORT).show()
+                    Log.d("HomeFragment", result.message);
+                    Toast.makeText(activity, result.message, Toast.LENGTH_SHORT).show()
                 }
             }
         })

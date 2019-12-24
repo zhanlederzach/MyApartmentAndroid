@@ -18,6 +18,7 @@ interface IRestarauntRepository {
     fun getBookedRestaurants(): Single<List<Restaraunt>>
     fun deleteBookedRestaurants()
     fun getLocalResto(): Single<List<Restaraunt>>
+    fun deleteRestoraunt(restoraunt: Restaraunt)
 }
 
 private const val RESTARAUNT_BOOKED = "resto_booked"
@@ -133,6 +134,18 @@ class RestarauntRepositoryImpl (
 
     override fun deleteBookedRestaurants() {
         FileUtils.forceDelete(localStorage.createFileInDir(fileName = RESTARAUNT_BOOKED))
+    }
+
+    override fun deleteRestoraunt(restoraunt: Restaraunt) {
+        val file = localStorage.createFileInDir(fileName = RESTARAUNT_BOOKED)
+        val json = FileUtils.readFileToString(file, "UTF-8")
+        Log.d("ResoRepoFile", json);
+        if (!json.isNullOrEmpty()) {
+            Log.d("ResoRepoEr3", "not empty");
+            val restoraunts = (gson.fromJson<List<Restaraunt>>(json, restoTypeToken) as MutableList<Restaraunt>)
+            restoraunts.remove(restoraunt)
+            FileUtils.writeStringToFile(file, gson.toJson(restoraunts), Charsets.UTF_8)
+        }
     }
 }
 
